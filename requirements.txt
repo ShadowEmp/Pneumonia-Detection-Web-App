@@ -1,0 +1,25 @@
+# Deep Learning Framework (Python 3.12 compatible)
+tensorflow==2.19.1
+
+# Image Processing
+opencv-python==4.8.1.78
+Pillow==10.1.0
+numpy==1.26.4
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Machine Learning Utils (Python 3.12 compatible)
+scikit-learn==1.4.2
+
+# Web Framework
+flask==3.0.0
+flask-cors==4.0.0
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+
+# Utilities
+pandas==2.1.4
+tqdm==4.66.1
