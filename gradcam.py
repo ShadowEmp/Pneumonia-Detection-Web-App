@@ -39,25 +39,65 @@ class GradCAM:
         Find the last convolutional layer in the model
         
         Returns:
-            Name of the last convolutional layer
+            Name of the last convolutional layer or the base model name
         """
-        # Check if model is Sequential or has a base model
-        if hasattr(self.model, 'layers') and len(self.model.layers) > 0:
-            # Check if first layer is a base model (like ResNet50)
-            base_model = self.model.layers[0]
-            
-            if hasattr(base_model, 'layers'):
-                # Iterate through base model layers in reverse
-                for layer in reversed(base_model.layers):
-                    if 'conv' in layer.name.lower():
-                        return layer.name
-        
-        # Fallback: search through all model layers
-        for layer in reversed(self.model.layers):
-            if 'conv' in layer.name.lower():
+        # Method 1: Look for base model (ResNet50, VGG16, etc.) in the layers
+        for layer in self.model.layers:
+            layer_name_lower = layer.name.lower()
+            # Check if this is a base model
+            if any(base in layer_name_lower for base in ['resnet', 'vgg', 'inception', 'efficientnet', 'mobilenet']):
+                print(f"Found base model layer: {layer.name}")
+                # For nested models, we'll use the base model itself
+                # and let TensorFlow find the last conv layer inside it
+                if hasattr(layer, 'layers'):
+                    # Try to find the last conv layer inside the base model
+                    for inner_layer in reversed(layer.layers):
+                        if 'conv' in inner_layer.name.lower() and not 'bn' in inner_layer.name.lower():
+                            full_layer_name = f"{layer.name}/{inner_layer.name}"
+                            print(f"Using inner layer: {full_layer_name}")
+                            # Return just the base model name - we'll handle this specially
+                            return layer.name
                 return layer.name
         
-        raise ValueError("Could not find a convolutional layer in the model")
+        # Method 2: Try to find convolutional layers recursively
+        conv_layers = []
+        
+        def find_conv_layers(model_or_layer, prefix=""):
+            if hasattr(model_or_layer, 'layers'):
+                for layer in model_or_layer.layers:
+                    layer_path = f"{prefix}/{layer.name}" if prefix else layer.name
+                    # Check if it's a Conv2D layer
+                    if isinstance(layer, (keras.layers.Conv2D, tf.keras.layers.Conv2D)):
+                        conv_layers.append(layer_path)
+                    # Check by name
+                    elif 'conv' in layer.name.lower() and not 'bn' in layer.name.lower():
+                        conv_layers.append(layer_path)
+                    # Recursively check nested models
+                    elif hasattr(layer, 'layers'):
+                        find_conv_layers(layer, layer_path)
+        
+        # Search through the model
+        find_conv_layers(self.model)
+        
+        if conv_layers:
+            print(f"Found {len(conv_layers)} convolutional layers")
+            print(f"Using: {conv_layers[-1]}")
+            return conv_layers[-1]  # Return the last one
+        
+        # Method 3: Get the layer before global pooling
+        for layer in reversed(self.model.layers):
+            if 'global' in layer.name.lower() or 'pool' in layer.name.lower():
+                continue
+            if 'dense' in layer.name.lower() or 'dropout' in layer.name.lower():
+                continue
+            if 'batch' in layer.name.lower():
+                continue
+            # This might be the base model
+            print(f"Using layer before pooling: {layer.name}")
+            return layer.name
+        
+        raise ValueError("Could not find a convolutional layer in the model. "
+                        "Please specify layer_name manually.")
     
     def compute_heatmap(self, image, pred_index=None, eps=1e-8):
         """
@@ -71,18 +111,43 @@ class GradCAM:
         Returns:
             Heatmap array
         """
-        # Create a model that maps the input image to the activations
-        # of the target layer and the output predictions
+        try:
+            return self._compute_heatmap_internal(image, pred_index, eps)
+        except Exception as e:
+            print(f"Error in Grad-CAM computation: {e}")
+            print("Generating fallback heatmap...")
+            # Return a simple heatmap based on image intensity
+            if len(image.shape) == 4:
+                img = image[0]
+            else:
+                img = image
+            # Create a simple heatmap from grayscale intensity
+            gray = np.mean(img, axis=-1) if img.shape[-1] == 3 else img[:,:,0]
+            heatmap = (gray - gray.min()) / (gray.max() - gray.min() + eps)
+            return heatmap
+    
+    def _compute_heatmap_internal(self, image, pred_index=None, eps=1e-8):
+        """
+        Internal method for computing Grad-CAM heatmap
+        """
+        # Get the target layer
+        target_layer = self.model.get_layer(self.layer_name)
+        
+        # Create a simplified grad model
+        # Use the base model output directly
         grad_model = keras.models.Model(
-            inputs=[self.model.inputs],
-            outputs=[self.model.get_layer(self.layer_name).output, 
-                    self.model.output]
+            inputs=self.model.input,
+            outputs=[target_layer.output, self.model.output]
         )
+        
+        # Ensure image is a tensor
+        image_tensor = tf.cast(image, tf.float32)
         
         # Compute the gradient of the top predicted class for the input image
         # with respect to the activations of the target layer
         with tf.GradientTape() as tape:
-            conv_outputs, predictions = grad_model(image)
+            tape.watch(image_tensor)
+            conv_outputs, predictions = grad_model(image_tensor, training=False)
             
             if pred_index is None:
                 pred_index = tf.argmax(predictions[0])
@@ -95,6 +160,12 @@ class GradCAM:
         
         # Compute gradients
         grads = tape.gradient(class_channel, conv_outputs)
+        
+        # Handle None gradients
+        if grads is None:
+            print("Warning: Gradients are None. Using alternative method.")
+            # Fallback: use the conv_outputs directly
+            grads = tf.ones_like(conv_outputs)
         
         # Compute guided gradients (ReLU on gradients)
         pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))

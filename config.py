@@ -34,6 +34,12 @@ BEST_MODEL_PATH = os.path.join(MODEL_DIR, 'best_pneumonia_model.h5')
 CLASS_NAMES = ['Normal', 'Pneumonia']
 NUM_CLASSES = len(CLASS_NAMES)
 
+# Prediction Threshold
+# Lower = more sensitive (catches more pneumonia, more false alarms)
+# Higher = more specific (fewer false alarms, misses more pneumonia)
+# Recommended: 0.3 for high sensitivity, 0.4 for medical screening, 0.5 for balanced
+PREDICTION_THRESHOLD = 0.3  # Very sensitive - catches subtle pneumonia cases
+
 # Data Augmentation Parameters
 AUGMENTATION_CONFIG = {
     'rotation_range': 20,
