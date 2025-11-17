@@ -12,13 +12,13 @@ from config import *
 def make_gradcam_heatmap(img_array, model, last_conv_layer_name='resnet50', pred_index=None):
     """
     Generate attention-based heatmap (simplified for nested models)
-    
+nsdama    
     Args:
         img_array: Input image array (batch, height, width, channels)
         model: Trained model
         last_conv_layer_name: Name of last conv layer (not used in simplified version)
         pred_index: Class index to visualize (None for predicted class)
-    
+    sSS
     Returns:
         Heatmap array
     """
