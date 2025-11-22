@@ -3,7 +3,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://pneumonia-detection-web-app-9gou.onrender.com/api/:path*"
+            "destination": "https://shadow1emp-pneumonia-detection-api.hf.space/api/:path*"
         },
         {
             "source": "/(.*)",
