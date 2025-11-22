@@ -25,3 +25,4 @@ pandas==2.1.4
 tqdm==4.66.1
 gunicorn
 requests
+gdown
