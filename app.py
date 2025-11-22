@@ -500,11 +500,11 @@ def internal_server_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 
+# Load model on startup (Global scope for Gunicorn)
+print("🚀 Starting Pneumonia Detection API...")
+load_model()
+
 if __name__ == '__main__':
-    # Load model on startup
-    print("Starting Pneumonia Detection API...")
-    load_model()
-    
     # Run app
     app.run(
         host=API_HOST,
