@@ -4,7 +4,7 @@ import gdown
 
 # URL of your model file (Direct download link)
 # We use the environment variable 'MODEL_URL', or fall back to the hardcoded Google Drive link
-DEFAULT_URL = 'https://drive.google.com/uc?id=1bjb_zGpEb-8Exf-wkZncP93RObP9ie_W'
+DEFAULT_URL = 'https://drive.google.com/file/d/1bjb_zGpEb-8Exf-wkZncP93RObP9ie_W/view?usp=sharing'
 MODEL_URL = os.environ.get('MODEL_URL', DEFAULT_URL)
 MODEL_PATH = 'models/best_pneumonia_model.h5'
 
@@ -32,11 +32,16 @@ def download_model():
             print(f"✅ Model downloaded successfully to {MODEL_PATH}")
         else:
             print("❌ Download failed (no output file)")
-            sys.exit(1)
+            # Don't exit, let app handle fallback
+            raise Exception("Download failed")
         
     except Exception as e:
         print(f"❌ Failed to download model: {str(e)}")
-        sys.exit(1)
+        # Don't exit, let app handle fallback
+        raise e
 
 if __name__ == "__main__":
-    download_model()
+    try:
+        download_model()
+    except:
+        sys.exit(1)
