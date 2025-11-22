@@ -4,6 +4,12 @@ WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt
 
+# Install system dependencies for OpenCV
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
