@@ -8,6 +8,7 @@ import base64
 import numpy as np
 import cv2
 import random
+import gc
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -501,10 +502,14 @@ def internal_server_error(error):
 
 
 # Load model on startup (Global scope for Gunicorn)
-print("🚀 Starting Pneumonia Detection API...")
-load_model()
+# print("🚀 Starting Pneumonia Detection API...")
+# load_model()
 
 if __name__ == '__main__':
+    # Load model on startup
+    print("Starting Pneumonia Detection API...")
+    load_model()
+    
     # Run app
     app.run(
         host=API_HOST,
