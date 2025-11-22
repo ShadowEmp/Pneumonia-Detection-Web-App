@@ -19,6 +19,7 @@ from config import *
 from data_preprocessing import preprocess_single_image
 from gradcam_simple import generate_gradcam_visualization
 from model import PneumoniaDetectionModel
+from download_model import download_model
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -54,6 +55,14 @@ def load_model():
     global model, DEMO_MODE
     
     if model is None:
+        # Attempt to download model if not found
+        if not os.path.exists(BEST_MODEL_PATH) and not os.path.exists(MODEL_PATH):
+            print("⬇️ Model not found locally. Attempting download...")
+            try:
+                download_model()
+            except Exception as e:
+                print(f"❌ Failed to download model: {str(e)}")
+
         try:
             if os.path.exists(BEST_MODEL_PATH):
                 model = keras.models.load_model(BEST_MODEL_PATH)
