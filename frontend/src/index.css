@@ -2,75 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-gradient-to-br from-blue-50 via-white to-teal-50 min-h-screen;
-  }
+body {
+  cursor: none;
+  background-color: #09090b;
+  /* Void Black */
+  color: #e2e8f0;
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
 }
 
-@layer components {
-  .card {
-    @apply bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
-  }
-  
-  .btn-primary {
-    @apply bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-3 rounded-lg font-semibold 
-           transition-all duration-300 hover:from-blue-600 hover:to-teal-600 hover:shadow-lg 
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-  
-  .btn-secondary {
-    @apply bg-white text-blue-600 border-2 border-blue-500 px-6 py-3 rounded-lg font-semibold 
-           transition-all duration-300 hover:bg-blue-50 hover:shadow-md;
-  }
-  
-  .input-field {
-    @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 
-           focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-300;
-  }
-  
-  .medical-gradient {
-    @apply bg-gradient-to-r from-blue-500 via-teal-500 to-cyan-500;
-  }
+a,
+button,
+[role="button"],
+input,
+label {
+  cursor: none;
 }
 
-/* Loading spinner animation */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* 3D Utilities */
+.perspective-1000 {
+  perspective: 1000px;
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
+.perspective-2000 {
+  perspective: 2000px;
 }
 
-/* Fade in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.preserve-3d {
+  transform-style: preserve-3d;
 }
 
-.fade-in {
-  animation: fadeIn 0.5s ease-out;
+.backface-hidden {
+  backface-visibility: hidden;
 }
 
-/* Pulse animation for results */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Text Glow */
+.text-glow {
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    background-color: rgba(6, 182, 212, 0.2);
   }
+
   50% {
-    opacity: 0.8;
+    transform: scale(0.95);
+    background-color: rgba(236, 72, 153, 0.3);
+    /* Pink pulse */
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: transparent;
   }
 }
 
-.pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.animate-ripple {
+  animation: ripple 0.5s ease-out forwards;
 }

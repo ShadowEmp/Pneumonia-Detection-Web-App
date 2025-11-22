@@ -1,126 +1,117 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { Activity, Upload, BarChart3, Info } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { ReactLenis } from '@studio-freight/react-lenis'
 import HomePage from './pages/HomePage'
 import UploadPage from './pages/UploadPage'
 import AnalysisPage from './pages/AnalysisPage'
 import AboutPage from './pages/AboutPage'
+import Cursor from './components/Cursor'
+import GridBackground from './components/GridBackground'
+
+import NeuralField from './components/NeuralField'
+
+import ScrollToTop from './components/ScrollToTop'
 
 function App() {
   const [navActive, setNavActive] = useState('home')
+  const containerRef = useRef(null)
+  const { scrollY } = useScroll()
+
+  const y1 = useTransform(scrollY, [0, 1000], [0, 200])
+  const y2 = useTransform(scrollY, [0, 1000], [0, -150])
+  const rotate = useTransform(scrollY, [0, 1000], [0, 20])
 
   return (
-    <Router>
-      <div className="min-h-screen">
-        {/* Navigation Bar */}
-        <nav className="medical-gradient shadow-lg sticky top-0 z-50">
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              {/* Logo and Title */}
-              <Link to="/" className="flex items-center space-x-3" onClick={() => setNavActive('home')}>
-                <Activity className="w-8 h-8 text-white" />
-                <div>
-                  <h1 className="text-white text-2xl font-bold">Pneumonia Detection</h1>
-                  <p className="text-blue-100 text-xs">AI-Powered Medical Imaging</p>
+    <ReactLenis root>
+      <Router>
+        <ScrollToTop />
+        <Cursor />
+        <div className="min-h-screen relative bg-[#09090b] text-slate-200 selection:bg-cyan-500 selection:text-white font-sans">
+          <NeuralField />
+          {/* Neural Grid Background */}
+          <GridBackground />
+
+          {/* Floating Navbar */}
+          <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-5xl">
+            <div className="glass-dark rounded-full px-6 py-3 flex items-center justify-between">
+              {/* Logo */}
+              <Link to="/" className="flex items-center space-x-3 group" onClick={() => setNavActive('home')}>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-cyan-500 blur-md opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <Activity className="w-6 h-6 text-cyan-400 relative z-10" />
                 </div>
+                <span className="text-white font-bold tracking-wide font-mono">PNEUMO<span className="text-cyan-400">VISION</span></span>
               </Link>
 
-              {/* Navigation Links */}
-              <div className="flex space-x-6">
-                <Link
-                  to="/"
-                  onClick={() => setNavActive('home')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                    navActive === 'home'
-                      ? 'bg-white bg-opacity-20 text-white'
-                      : 'text-blue-100 hover:bg-white hover:bg-opacity-10'
-                  }`}
-                >
-                  <Activity className="w-5 h-5" />
-                  <span className="font-medium">Home</span>
-                </Link>
-
-                <Link
-                  to="/upload"
-                  onClick={() => setNavActive('upload')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                    navActive === 'upload'
-                      ? 'bg-white bg-opacity-20 text-white'
-                      : 'text-blue-100 hover:bg-white hover:bg-opacity-10'
-                  }`}
-                >
-                  <Upload className="w-5 h-5" />
-                  <span className="font-medium">Upload</span>
-                </Link>
-
-                <Link
-                  to="/analysis"
-                  onClick={() => setNavActive('analysis')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                    navActive === 'analysis'
-                      ? 'bg-white bg-opacity-20 text-white'
-                      : 'text-blue-100 hover:bg-white hover:bg-opacity-10'
-                  }`}
-                >
-                  <BarChart3 className="w-5 h-5" />
-                  <span className="font-medium">Analysis</span>
-                </Link>
-
-                <Link
-                  to="/about"
-                  onClick={() => setNavActive('about')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                    navActive === 'about'
-                      ? 'bg-white bg-opacity-20 text-white'
-                      : 'text-blue-100 hover:bg-white hover:bg-opacity-10'
-                  }`}
-                >
-                  <Info className="w-5 h-5" />
-                  <span className="font-medium">About</span>
-                </Link>
+              {/* Links */}
+              <div className="hidden md:flex items-center space-x-1">
+                {[
+                  { path: '/', label: 'Home', icon: Activity, id: 'home' },
+                  { path: '/upload', label: 'Analyze', icon: Upload, id: 'upload' },
+                  { path: '/analysis', label: 'Metrics', icon: BarChart3, id: 'analysis' },
+                  { path: '/about', label: 'About', icon: Info, id: 'about' },
+                ].map((item) => (
+                  <Link
+                    key={item.id}
+                    to={item.path}
+                    onClick={() => setNavActive(item.id)}
+                    className={`relative px-4 py-2 rounded-full transition-all duration-300 group ${navActive === item.id ? 'text-white' : 'text-slate-400 hover:text-white'
+                      }`}
+                  >
+                    {navActive === item.id && (
+                      <motion.div
+                        layoutId="nav-pill"
+                        className="absolute inset-0 bg-white/10 rounded-full"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center space-x-2 text-sm font-medium">
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </span>
+                  </Link>
+                ))}
               </div>
             </div>
-          </div>
-        </nav>
+          </nav>
 
-        {/* Main Content */}
-        <main className="container mx-auto px-6 py-8">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/analysis" element={<AnalysisPage />} />
-            <Route path="/about" element={<AboutPage />} />
-          </Routes>
-        </main>
+          {/* Main Content */}
+          <main className="relative z-10 pt-32 pb-20 px-6">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/analysis" element={<AnalysisPage />} />
+              <Route path="/about" element={<AboutPage />} />
+            </Routes>
+          </main>
 
-        {/* Footer */}
-        <footer className="bg-gray-800 text-white mt-16">
-          <div className="container mx-auto px-6 py-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-4 md:mb-0">
-                <p className="text-sm">
-                  © 2024 Pneumonia Detection System. All rights reserved.
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Powered by Deep Learning & Grad-CAM
-                </p>
-              </div>
-              <div className="flex space-x-6">
-                <a href="#" className="text-sm hover:text-blue-400 transition-colors">
-                  Privacy Policy
-                </a>
-                <a href="#" className="text-sm hover:text-blue-400 transition-colors">
-                  Terms of Service
-                </a>
-                <a href="#" className="text-sm hover:text-blue-400 transition-colors">
-                  Contact
-                </a>
+          {/* Footer */}
+          <footer className="relative z-10 border-t border-white/10 bg-black/20 backdrop-blur-md mt-20">
+            <div className="container mx-auto px-6 py-12">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <div className="mb-4 md:mb-0 text-center md:text-left">
+                  <p className="text-sm text-slate-400">
+                    © 2024 NeuroScan AI. Advancing Medical Diagnostics.
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Powered by ResNet50 & Grad-CAM Visualization
+                  </p>
+                </div>
+                <div className="flex space-x-8">
+                  {['Privacy', 'Terms', 'Contact'].map((item) => (
+                    <a key={item} href="#" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors">
+                      {item}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </footer>
-      </div>
-    </Router>
+          </footer>
+        </div>
+      </Router>
+    </ReactLenis>
   )
 }
 

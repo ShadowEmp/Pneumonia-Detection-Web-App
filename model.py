@@ -275,13 +275,41 @@ class PneumoniaDetectionModel:
         if self.model is None:
             raise ValueError("Model must be built and trained before fine-tuning")
         
-        # Unfreeze the base model layers
-        base_model = self.model.layers[0]
+        # Robustly find the base model (feature extractor)
+        base_model = None
+        
+        # 1. Check if the first layer is the base model (standard case)
+        if len(self.model.layers) > 0 and hasattr(self.model.layers[0], 'layers'):
+            base_model = self.model.layers[0]
+        
+        # 2. If not, search for it (in case InputLayer is first)
+        if base_model is None:
+            for layer in self.model.layers:
+                # Look for a layer that is a Model/Functional (has layers) and is not the main model itself
+                if hasattr(layer, 'layers') and len(layer.layers) > 0:
+                    base_model = layer
+                    break
+        
+        # 3. If still not found, assume the model itself is flat (e.g. VGG16 loaded directly)
+        if base_model is None:
+            print("Note: No nested base model found. Fine-tuning the main model layers directly.")
+            base_model = self.model
+
+        print(f"Base model for fine-tuning: {base_model.name}")
+        
+        # Unfreeze the base model
         base_model.trainable = True
         
         # Freeze all layers except the last 'unfreeze_layers'
-        for layer in base_model.layers[:-unfreeze_layers]:
-            layer.trainable = False
+        # We filter out InputLayer objects which don't have weights
+        layers_to_freeze = [l for l in base_model.layers if not isinstance(l, keras.layers.InputLayer)]
+        
+        # Safety check
+        if len(layers_to_freeze) > unfreeze_layers:
+            for layer in layers_to_freeze[:-unfreeze_layers]:
+                layer.trainable = False
+        else:
+            print(f"Warning: Requested to unfreeze {unfreeze_layers} layers, but model only has {len(layers_to_freeze)}. All layers will be trainable.")
         
         # Recompile with lower learning rate
         self.model.compile(

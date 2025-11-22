@@ -502,3 +502,5 @@ if __name__ == '__main__':
         port=API_PORT,
         debug=True
     )
+
+    # Config reverted to original model (Final)

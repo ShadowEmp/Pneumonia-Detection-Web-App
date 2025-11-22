@@ -26,9 +26,6 @@ data/
 *.tar.gz
 
 # Models (uncomment if you want to track models)
-models/
-# !models/.gitkeep
-
 # Results
 results/
 *.png
