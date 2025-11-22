@@ -3,8 +3,10 @@ import requests
 import sys
 
 # URL of your model file (Direct download link)
-# REPLACE THIS with your actual direct download link (Dropbox, Google Drive, etc.)
-MODEL_URL = os.environ.get('https://drive.google.com/file/d/1bjb_zGpEb-8Exf-wkZncP93RObP9ie_W/view?usp=drive_link')
+# We use the environment variable 'MODEL_URL', or fall back to the hardcoded Google Drive link
+# Converted to direct download link: https://drive.google.com/uc?export=download&id=...
+DEFAULT_URL = 'https://drive.google.com/uc?export=download&id=1bjb_zGpEb-8Exf-wkZncP93RObP9ie_W'
+MODEL_URL = os.environ.get('MODEL_URL', DEFAULT_URL)
 MODEL_PATH = 'models/best_pneumonia_model.h5'
 
 def download_model():
