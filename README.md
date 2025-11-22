@@ -1,3 +1,12 @@
+---
+title: Pneumonia Detection Api
+emoji: 🫁
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # PneumoVision: AI-Powered Pneumonia Detection
 
 PneumoVision is a state-of-the-art web application designed to assist medical professionals and patients in the early detection of pneumonia from chest X-ray images. Powered by a fine-tuned ResNet50 deep learning model, it provides instant, accurate analysis with visual explainability using Grad-CAM technology.
