@@ -38,8 +38,8 @@ const NeuralField = () => {
                         originY: randomY,
                         vx: 0,
                         vy: 0,
-                        size: Math.random() * 1.5 + 0.5,
-                        color: `hsl(${Math.random() * 40 + 180}, 70%, 60%)`, // Cyan/Blue range
+                        size: Math.random() * 2.5 + 1.0, // Increased size
+                        color: `hsl(${Math.random() * 40 + 180}, 100%, 75%)`, // Brighter/Vibrant Cyan
                         phaseX: Math.random() * Math.PI * 2, // Random starting phase for X
                         phaseY: Math.random() * Math.PI * 2  // Random starting phase for Y
                     });
@@ -107,29 +107,39 @@ const NeuralField = () => {
                 p.x += p.vx;
                 p.y += p.vy;
 
-                // Draw particle
+                // Draw particle with glow
+                ctx.shadowBlur = 15; // Glow strength
+                ctx.shadowColor = p.color;
+
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
                 ctx.fill();
+
+                // Reset shadow to avoid affecting other elements heavily
+                ctx.shadowBlur = 0;
             });
 
             // Draw connections (optimized)
-            ctx.lineWidth = 0.3; // Slightly thicker
-            ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)'; // Higher opacity
+            ctx.lineWidth = 0.6; // Thicker lines for better visibility
+            const maxDist = 120;
+            const maxDistSq = maxDist * maxDist;
 
             for (let i = 0; i < particles.current.length; i++) {
                 const p1 = particles.current[i];
 
                 // Check more neighbors for better connectivity
-                for (let j = i + 1; j < Math.min(i + 100, particles.current.length); j++) {
+                for (let j = i + 1; j < Math.min(i + 150, particles.current.length); j++) {
                     const p2 = particles.current[j];
                     const dx = p1.x - p2.x;
                     const dy = p1.y - p2.y;
                     const distSq = dx * dx + dy * dy;
 
-                    // Increased distance to 100px (10000) to ensure diagonals and further nodes connect
-                    if (distSq < 10000) {
+                    if (distSq < maxDistSq) {
+                        // Dynamic opacity based on distance (closer = stronger)
+                        const opacity = 1 - (distSq / maxDistSq);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${opacity * 0.6})`;
+
                         ctx.beginPath();
                         ctx.moveTo(p1.x, p1.y);
                         ctx.lineTo(p2.x, p2.y);

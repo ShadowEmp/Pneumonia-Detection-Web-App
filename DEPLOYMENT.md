@@ -34,21 +34,15 @@ Render's free tier (512MB RAM) is too small for our AI model. **Hugging Face Spa
     *   Open `frontend/vercel.json`.
     *   Replace the `destination` URL with your new **Hugging Face URL**.
     *   Commit and push to GitHub.
-2.  **Deploy on Vercel** as usual.
+2.  **Deploy on Vercel:**
+    *   Sign up at [vercel.com](https://vercel.com).
+    *   **Add New Project** and import your GitHub repo.
+    *   **Root Directory:** Select `frontend`.
+    *   **Framework Preset:** Vite.
+    *   **Deploy.**
 
-## 2. Frontend (Vercel)
-The React frontend can be hosted on Vercel.
-
-1.  **Update Configuration:**
-    *   Open `frontend/vercel.json`.
-    *   Replace `https://your-backend-url.onrender.com` with your **actual Render backend URL**.
-    *   Commit and push this change.
-2.  Sign up at [vercel.com](https://vercel.com).
-3.  **Add New Project** and import your GitHub repo.
-4.  **Root Directory:** Select `frontend`.
-5.  **Framework Preset:** Vite.
-6.  **Deploy.**
-
-## Why this setup?
-*   **Vercel** is optimized for static sites and lightweight serverless functions (Frontend).
-*   **Render** handles heavy Python/ML workloads with larger memory requirements (Backend).
+## ⚠️ Important Note: Cold Starts
+Hugging Face Spaces (Free Tier) will **pause after 48 hours of inactivity**.
+*   **What this means:** The first request after a pause will take **1-2 minutes** to process because the server needs to wake up and re-download the AI model.
+*   **Subsequent requests:** Will be instant.
+*   **Recommendation:** If the app seems "stuck," just wait a minute for it to wake up.
