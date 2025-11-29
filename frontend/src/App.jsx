@@ -28,7 +28,7 @@ function App() {
       <Router>
         <ScrollToTop />
         <Cursor />
-        <div className="min-h-screen relative bg-[#09090b] text-slate-200 selection:bg-cyan-500 selection:text-white font-sans">
+        <div className="min-h-screen relative text-slate-200 selection:bg-cyan-500 selection:text-white font-sans">
           <NeuralField />
           {/* Neural Grid Background */}
           <GridBackground />

@@ -44,7 +44,7 @@ const GridBackground = () => {
     return (
         <div
             ref={containerRef}
-            className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none"
+            className="fixed inset-0 z-0 overflow-hidden pointer-events-none"
         >
             <div
                 className="absolute inset-0 grid gap-[1px] pointer-events-auto"

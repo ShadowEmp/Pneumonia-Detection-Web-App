@@ -131,8 +131,8 @@ function AboutPage() {
             <div className="space-y-4">
               {[
                 { label: "SOURCE", value: "Chest X-Ray Images (Pneumonia)" },
-                { label: "TRAINING SET", value: "5,216 Images" },
-                { label: "TEST SET", value: "624 Images" },
+                { label: "TRAINING SET", value: "90,000 Images" },
+                { label: "TEST SET", value: "10,000 Images" },
                 { label: "CLASSES", value: "Normal vs. Pneumonia" }
               ].map((item, idx) => (
                 <div key={idx} className="flex justify-between items-center border-b border-white/5 pb-3 last:border-0">

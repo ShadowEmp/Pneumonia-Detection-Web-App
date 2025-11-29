@@ -164,7 +164,7 @@ const NeuralField = () => {
     return (
         <canvas
             ref={canvasRef}
-            className="fixed inset-0 pointer-events-none z-[0]" // Background layer
+            className="fixed inset-0 pointer-events-none z-[1]" // Background layer
             style={{ mixBlendMode: 'screen' }} // Add nice blend mode
         />
     );
